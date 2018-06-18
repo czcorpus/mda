@@ -7,11 +7,7 @@ output:
     toc: yes
 ---
 
-```{r include=FALSE}
-library(tidyverse)
-```
-
-**NB:** This is complementary material to Section 4 of XX (YYYY), which
+**NB:** This is complementary material to Section 4 of XX (ZZZZ), which
 presents a more accessible conceptual background to the rather technical
 discussion below.
 
@@ -20,29 +16,60 @@ Introduction
 
 In *multi-dimensional analysis* (MDA; Biber 1988), linguistic features
 are grouped into dimensions of variation based on the texts in which
-they co-occur, via a statistical procedure called *factor analysis*
-(FA). One input parameter to FA is the **number of factors to extract**,
-which are then interpreted as dimensions. Consequently, this parameter
-has a considerable influence on the picture of language variation that
-emerges from the analysis.
+they co-occur, via a statistical procedure called [*factor
+analysis*](https://en.wikipedia.org/wiki/Factor_analysis) (FA). One
+input parameter to FA is the **number of factors to extract**, which are
+then interpreted as dimensions. Consequently, this parameter has a
+considerable influence on the picture of language variation that emerges
+from the analysis.
 
 Many heuristic methods designed to help with making that choice exist,
-all of them with advantages and disadvantages (Revelle 2017: 38). One
-popular choice in the context of MDA is to manually compare several
-plausible candidate models (with different numbers of factors) and
-select the one which yields the best interpretation. The procedure
-presented here is an attempt to quantify some of the criteria used in
-model comparison, so as to aid decision in situations where no clear
-winner emerges based on manual comparisons.
+all of them with advantages and disadvantages:
+
+> Using either the chi square test or the change in square test is, of
+> course, sensitive to the number of subjects and leads to the
+> nonsensical condition that if one wants to find many factors, one
+> simply runs more subjects. Parallel analysis is partially sensitive to
+> sample size in that for large samples (N > 1,000) all of the eigen
+> values of random factors will be very close to 1. The scree test is
+> quite appealing but can lead to differences of interpretation as to
+> when the scree “breaks”. Extracting interpretable factors means that
+> the number of factors reflects the investigators creativity more than
+> the data. vss, while very simple to understand, will not work very
+> well if the data are very factorially complex. (Simulations suggests
+> it will work fine if the complexities of some of the items are no more
+> than 2). The eigen value of 1 rule, although the default for many
+> programs, seems to be a rough way of dividing the number of variables
+> by 3 and is probably the worst of all criteria.
+>
+> ([Revelle 2017: 38](http://personality-project.org/r/psych/HowTo/factor.pdf))
+
+In practical, real-world settings, some of these methods can often be
+ruled out right off the bat. Take the example of our MDA of Czech,
+described e.g. in XX (ZZZZ): since the number of observations is 3000+,
+we cannot use parallel analysis; mean item complexity of 2.3 rules out
+vss. One popular choice in the context of MDA is to manually compare
+several plausible candidate models (with different numbers of factors)
+and select the one which yields the best interpretation (with the
+obvious disadvantage of the subjectivity of such a decision, cf.
+*extracting interpretable factors* above).
+
+Considering that other MDA projects may encounter similar obstacles, we
+suggest a procedure designed to aid this manual comparison. It consists
+in a quantitative reformulation of some of the comparison criteria, thus
+minimizing the subjectivity of the decision, especially in situations
+where no clear winner is readily apparent.
 
 The procedure can be summarized thus:
 
-1. Perform hierarchical cluster analysis on the features based on their
-   *absolute* loadings on all factors of all candidate models. This
-   gives us an idea of which regularities tend to hold across all
-   proposed solutions: e.g. features $A$ and $B$ may tend to always load
-   heavily on the same dimension, so they emerge from the HCA as close
-   to one another, whereas $C$ always loads most prominently elsewhere.
+1. Perform [hierarchical cluster analysis
+   (HCA)](http://www.r-tutor.com/gpu-computing/clustering/hierarchical-cluster-analysis)
+   on the features based on their *absolute* loadings on all factors of
+   all candidate models. This gives us an idea of which regularities
+   tend to hold across all proposed solutions: e.g. features $A$ and $B$
+   may tend to always load heavily on the same dimension, so they emerge
+   from the HCA as close to one another, whereas $C$ always loads most
+   prominently elsewhere.
 2. For each $f$-factor model, generate a corresponding $f$-cluster
    partition of the HCA output (by pruning it).
 3. Take every possible pair of $i$-factor model and $j$-cluster
@@ -54,7 +81,7 @@ The procedure can be summarized thus:
    model which tends to come out of these comparisons as tidier than its
    peers is one that better represents the robust feature-grouping
    trends inferred via HCA, which is an argument in its favor.
-   
+
 This document focuses on step 3: how to operationalize *tidiness*. We
 start by giving an abstract definition, but if it feels dense, you may
 want to skip ahead to the [concrete example with code](#implementation)
@@ -90,10 +117,10 @@ $$
 
 Furthermore, $p(x,y)$ is the [joint
 probability](https://en.wikipedia.org/wiki/Joint_probability_distribution)
-function of $X$ and $Y$; $p(x)$ and $p(y)$ are the [marginal probability
-distribution](https://en.wikipedia.org/wiki/Marginal_distribution)
-functions of $X$ and $Y$ respectively. Finally, $X$ is an $i$-cluster
-partition and $Y$ is a $j$-factor model.
+of $X$ and $Y$; $p(x)$ and $p(y)$ are the [marginal
+probability](https://en.wikipedia.org/wiki/Marginal_distribution) of $X$
+and $Y$ respectively. Finally, $X$ is an $i$-cluster partition and $Y$
+is a $j$-factor model.
 
 Implementation
 ==============
@@ -105,27 +132,29 @@ The objective is to compare two groupings (clusters and factors) of the
 same objects (features), assessing how tidy the mapping from one to the
 other is.
 
-In one of the groupings (clusters), group membership is binary and
+In one of the groupings -- clusters -- group membership is binary and
 exclusive: a feature either belongs to a cluster or not. Say we have 4
 features and 2 clusters. We can generate a table that tells us, for
 every possible combination of feature and cluster, whether that feature
 belongs to the cluster or not:
 
-```{r}
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+
 clusters <- expand.grid(FEATURE=LETTERS[1:4], CLUSTER=c("c1", "c2")) %>% as_tibble()
 clusters$BELONGS_TO_CLUSTER <- c(1, 1, 0, 0, 0, 0, 1, 1)
 clusters
 ```
 
-$\Rightarrow$ Features `A` and `B` belong to cluster `c1`, `C` and `D` to `c2`.
+$\Rightarrow$ Features `A` and `B` belong to cluster `c1`, `C` and `D`
+to `c2`.
 
-In the other grouping (factors), group membership is gradual, each
-feature can belong to different factors to different extents, as
-quantified by its different loadings on those factors. Again, here's a
-possible table for 4 features and 2 factors (it could have been a
-different number, in general, we want to be able to compare any
-$i$-cluster partition with any $j$-factor model; only the number of
-features remains the same):
+With factors, group membership is gradual. Each feature "belongs" to
+**all** of the factors to different extents, as quantified by its
+different loadings on those factors. Again, here's a possible table for
+4 features and 2 factors (it could have been a different number, in
+general, we want to be able to compare any $i$-cluster partition with
+any $j$-factor model; only the number of features remains the same):
 
 ```{r}
 factors <- expand.grid(FEATURE=LETTERS[1:4], FACTOR=c("f1", "f2")) %>% as_tibble()
@@ -144,8 +173,8 @@ data <- inner_join(clusters, factors, by="FEATURE")
 data
 ```
 
-The observed occurrences of features within clusters are tallied in the
-`BELONGS_TO_CLUSTER` column, the correlations between features and
+The observed occurrences of features within clusters are represented by
+the `BELONGS_TO_CLUSTER` column, the correlations between features and
 factors are indicated in the `LOADING_ON_FACTOR` column. Each row
 represents an event where a given feature was found in a given cluster
 and a given factor at the same time.
@@ -299,13 +328,13 @@ In the functions, we'll use a vectorized implementation instead.
 tidiness <- function(data) {
   data_with_probabilities <- weight_and_aggregate(data) %>%
     add_probabilities()
-  I <- mutual_information(data_with_probabilities) 
+  I <- mutual_information(data_with_probabilities)
   H <- joint_entropy(data_with_probabilities)
   I / H
 }
 
 weight_and_aggregate <- function(data) {
- mutate( 
+ mutate(
     data,
     # compute weights
     WEIGHT=BELONGS_TO_CLUSTER * abs(LOADING_ON_FACTOR)
@@ -410,20 +439,20 @@ tidiness(messier_data)
 tidiness(data) > tidiness(messier_data)
 ```
 
-Good, it seems to work! The data we made messier on purpose is indeed
-identified as less tidy than the original data. This makes sense,
+Good, it seems to be working! The data we made messier on purpose is
+indeed identified as less tidy than the original data. This makes sense,
 because in `messier_data`, the structure of factors has become less
 predictable based on the structure of clusters.
 
 References
 ==========
 
-XX. YYYY. *From extra- to intratextual characteristics: Charting the
-  space of variation in Czech through MDA*.
+Biber, Douglas. 1988. *Variation across speech and writing*.
+  Cambridge: Cambridge University Press.
 
 Revelle, William. 2017. *psych: Procedures for Personality and
   Psychological Research*. Northwestern University, Evanston, Illinois,
   USA. <https://CRAN.R-project.org/package=psych> Version = 1.7.8.
 
-Biber, Douglas. 1988. *Variation across speech and writing*.
-  Cambridge: Cambridge University Press.
+XX, YY. ZZZZ. *From extra- to intratextual characteristics: Charting the
+  space of variation in Czech through MDA*.
