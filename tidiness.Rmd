@@ -7,9 +7,9 @@ output:
     toc: yes
 ---
 
-**NB:** This is complementary material to Section 4 of XX (ZZZZ), which
-presents a more accessible conceptual background to the rather technical
-discussion below.
+**NB:** This is complementary material to Section 4 of Cvrček et. al
+(2018), which presents a more accessible conceptual background to the
+rather technical discussion below.
 
 Introduction
 ============
@@ -450,9 +450,13 @@ References
 Biber, Douglas. 1988. *Variation across speech and writing*.
   Cambridge: Cambridge University Press.
 
+Cvrček, Václav, Zuzana Komrsková, David Lukeš, Petra Poukarová, Anna
+  Řehořková, Adrian Jan Zasina. 2018. From extra- to intratextual
+  characteristics: Charting the space of variation in Czech through MDA.
+  *Corpus Linguistics and Linguistic Theory*. Available on-line ahead of
+  print via
+  [doi:10.1515/cllt-2018-0020](https://doi.org/10.1515/cllt-2018-0020).
+
 Revelle, William. 2017. *psych: Procedures for Personality and
   Psychological Research*. Northwestern University, Evanston, Illinois,
   USA. <https://CRAN.R-project.org/package=psych> Version = 1.7.8.
-
-XX, YY. ZZZZ. *From extra- to intratextual characteristics: Charting the
-  space of variation in Czech through MDA*.
