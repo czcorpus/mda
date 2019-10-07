@@ -26,4 +26,4 @@ Distributed under the [GNU General Public License v3][gplv3]
 [tidiness]: https://czcorpus.github.io/mda/tidiness.nb.html
 [rstudio]: https://www.rstudio.com/
 [cnc]: http://korpus.cz
-[gplv3]: http://www.gnu.org/licenses/gpl-3.0.en.html}
+[gplv3]: http://www.gnu.org/licenses/gpl-3.0.en.html
